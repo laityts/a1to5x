@@ -1,0 +1,11 @@
+./split-appended-dtb boot.img-zImage
+
+dtc -O dts -I dtb -o dtbdump_1.dts dtbdump_1.dtb 
+
+dtc -O dtb -I dts -o dtbdump_1_new.dtb dtbdump_1.dts
+
+cat kernel dtbdump_1_new.dtb > boot.img-zImage.new
+
+new 4.9 kernels:
+
+cat kernel dtbdump_1.dtb dtbdump_2.dtb dtbdump_3.dtb dtbdump_4.dtb dtbdump_5.dtb dtbdump_6.dtb dtbdump_7.dtb dtbdump_8.dtb dtbdump_9.dtb dtbdump_10.dtb dtbdump_11.dtb dtbdump_12.dtb dtbdump_13.dtb dtbdump_14.dtb dtbdump_15.dtb dtbdump_16.dtb dtbdump_17.dtb dtbdump_18.dtb dtbdump_19.dtb > boot.img-zImage.new

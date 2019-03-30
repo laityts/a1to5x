@@ -1,0 +1,14 @@
+ui_print("");
+ui_print("Flashing boot...");
+package_extract_file("boot.img", "/dev/block/bootdevice/by-name/boot");
+show_progress(0.1, 1);
+ui_print("Flashing system...");
+package_extract_file("system.img", "/dev/block/bootdevice/by-name/system");
+show_progress(0.6, 5);
+ui_print("Flashing tz...");
+package_extract_file("tz.img", "/dev/block/bootdevice/by-name/tz");
+show_progress(0.1, 1);
+ui_print("Flashing modem...");
+package_extract_file("modem.img", "/dev/block/bootdevice/by-name/modem");
+show_progress(1, 1);
+ui_print("Done...Enjoy..");

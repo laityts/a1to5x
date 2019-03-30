@@ -1,0 +1,6 @@
+#Requires components 
+sudo apt install python
+sudo apt install python3
+sudo apt install device-tree-compiler
+sudo apt install python-pip
+python -m pip install protobuf
