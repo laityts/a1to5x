@@ -1,11 +1,16 @@
 #!/bin/bash
 shopt -s extglob
 
+#path
+path="$(cd "$(dirname "$0")";pwd)"
+echo $path
+
 if [ -d ramdisk ]; then
     rm -rf ramdisk
+    rm -rf __MACOSX
 fi
-if [ -f kernel.gz ]; then
-    rm kernel.gz
+if [ -f image.gz-dtb ]; then
+    rm image.gz-dtb
 fi
 rm -rf old
 rm -rf output
@@ -16,8 +21,12 @@ if [ -f zipout/payload.bin ]; then
     mv zipout/payload.bin payload_dumper
     rm -rf zipout
     cd payload_dumper
+    if [ -d output ]; then
+        rm -rf output
+    fi
+    mkdir output
     python3 payload_dumper.py payload.bin
-    cd ..
+    cd $path
     mv payload_dumper/output/boot.img mkbootimg
     mv payload_dumper/output/system.img ./
     rm payload_dumper/payload.bin
@@ -29,7 +38,7 @@ fi
 
 rm -rf mkbootimg/boot
 
-cd mkbootimg
+cd $path/mkbootimg
 ./mkboot boot.img boot
 cd ..
 
@@ -44,22 +53,25 @@ sudo mv system/system/* system/.
 
 cd system
 fstab="vendor/etc/fstab.qcom"
+echo "fstab patching..."
 sudo sed -i 's/,slotselect//g' $fstab
 sudo sed -i 's/,verify//g' $fstab
 sudo sed -i 's/forceencrypt/encryptable/g' $fstab
-cp vendor/etc/fstab.qcom ~/a1to5x/output/
+cp vendor/etc/fstab.qcom $path/output/
 cd ..
 sudo umount system
 sudo rm -rf system
 
 cd mkbootimg
 sed -i 's/veritykeyid=id:\w*//g' boot/img_info
-cp boot/img_info  ~/a1to5x/output/
-mv boot/kernel ~/a1to5x/kernel.gz
-cd ..
-./split-appended-dtb kernel.gz
-rm kernel.gz
 
+cp boot/img_info  $path/output/
+mv boot/kernel boot/image.gz-dtb
+mv boot/image.gz-dtb $path/image.gz-dtb
+cd ..
+echo "split..."
+./split-appended-dtb image.gz-dtb
+rm image.gz-dtb
 if [ -f dtbdump_2.dtb ]; then
     echo "5 dtb"
     dtc -I dtb -O dts -o dtbdump_1.dts dtbdump_1.dtb
@@ -110,8 +122,8 @@ else
 fi
 
 mv *.dts output/
-cat kernel *.dtb > kernel.gz
-mv kernel.gz mkbootimg/boot/kernel
+cat kernel *.dtb > image.gz-dtb
+mv image.gz-dtb mkbootimg/boot/kernel
 rm kernel
 rm *.dtb
 cd mkbootimg
